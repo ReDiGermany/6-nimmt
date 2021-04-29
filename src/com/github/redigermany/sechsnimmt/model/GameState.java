@@ -1,16 +1,16 @@
-package model;
+package com.github.redigermany.sechsnimmt.model;
 
-import controller.Card;
-import controller.Deck;
-import controller.player.AiPlayer;
-import controller.player.Player;
-import controller.player.RealPlayer;
+import com.github.redigermany.sechsnimmt.controller.Card;
+import com.github.redigermany.sechsnimmt.controller.Deck;
+import com.github.redigermany.sechsnimmt.controller.player.AiPlayer;
+import com.github.redigermany.sechsnimmt.controller.player.Player;
+import com.github.redigermany.sechsnimmt.controller.player.RealPlayer;
 
 public class GameState {
     private final int maxOx;
-    private final Deck mainDeck;
-    private final RealPlayer player;
-    private final Player[] players;
+    private Deck mainDeck;
+    private RealPlayer player;
+    private Player[] players;
     private final Deck[] table = new Deck[4];
     private final int cardsNum = 104;
 
@@ -27,17 +27,22 @@ public class GameState {
 
     public GameState(int playersNum,int maxOx){
         this.maxOx = maxOx;
-        this.mainDeck = new Deck(cardsNum);
-        mainDeck.GenerateCards();
         players = new Player[playersNum];
-        player = new RealPlayer();
+//        ResetGame();
+    }
+
+    public void ResetGame(){
+        mainDeck = new Deck(cardsNum);
+        mainDeck.GenerateCards();
+        player = new RealPlayer(player);
         players[0] = (Player)player;
         for(int i=1;i<players.length;i++){
-            players[i] = new AiPlayer();
+            players[i] = new AiPlayer(players[i]);
         }
         for(int i=0;i<table.length;i++){
             table[i]=new Deck(5,true);
         }
+        System.out.println("[GameState] Reset");
     }
 
     public void sortTable(){
@@ -70,7 +75,7 @@ public class GameState {
         return table[i];
     }
 
-    public void addToTableRow(int i,Card card){
+    public void addToTableRow(int i, Card card){
         table[i].addCard(card);
     }
 

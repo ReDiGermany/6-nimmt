@@ -1,5 +1,4 @@
-package controller;
-
+package com.github.redigermany.sechsnimmt.controller;
 public class Card {
     private final int number;
     private int ox = 1;
@@ -9,11 +8,11 @@ public class Card {
         setOx();
     }
 
-    public int getNumber() {
+    public Integer getNumber() {
         return number;
     }
 
-    public int getOx() {
+    public Integer getOx() {
         return ox;
     }
 

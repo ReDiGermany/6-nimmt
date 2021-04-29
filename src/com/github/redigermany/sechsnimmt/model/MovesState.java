@@ -1,8 +1,8 @@
-package model;
+package com.github.redigermany.sechsnimmt.model;
 
-import controller.Card;
-import controller.Move;
-import controller.player.Player;
+import com.github.redigermany.sechsnimmt.controller.Card;
+import com.github.redigermany.sechsnimmt.controller.Move;
+import com.github.redigermany.sechsnimmt.controller.player.Player;
 
 public class MovesState {
     private Move[] moves;
@@ -28,7 +28,12 @@ public class MovesState {
     public void sort(){
         for(int i=0;i<moves.length;i++){
             for(int j=i+1;j<moves.length;j++){
-                if(moves[j].getCard().getNumber()<moves[i].getCard().getNumber()){
+                Card c1 = moves[j].getCard();
+                Card c2 = moves[i].getCard();
+                if(c1==null ||c2==null){
+                    System.out.println("?!?");
+                }
+                if(c1.getNumber()<c2.getNumber()){
                     Move temp = moves[i];
                     moves[i] = moves[j];
                     moves[j] = temp;

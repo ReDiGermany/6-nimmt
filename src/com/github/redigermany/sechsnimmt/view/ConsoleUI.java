@@ -1,13 +1,10 @@
-package view;
+package com.github.redigermany.sechsnimmt.view;
+import com.github.redigermany.sechsnimmt.controller.Card;
+import com.github.redigermany.sechsnimmt.controller.Deck;
+import com.github.redigermany.sechsnimmt.controller.GameMaster;
+import com.github.redigermany.sechsnimmt.model.GameState;
+import com.github.redigermany.sechsnimmt.model.MovesState;
 
-import controller.Card;
-import controller.Deck;
-import controller.GameMaster;
-import controller.Move;
-import model.GameState;
-import model.MovesState;
-
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ConsoleUI {
@@ -16,6 +13,7 @@ public class ConsoleUI {
     enum MenuItems {
         ShowBoard,
         ChooseCard,
+        ShowGame,
         ExitGame
     }
     public static MenuItems fetchValue(int i) {
@@ -32,6 +30,7 @@ public class ConsoleUI {
         }
     }
     private void MainMenu(){
+        gm.checkNewRound();
         System.out.println("Hauptmenü\nWas möchten Sie tun?");
         ListMenuItems();
         if(sc.hasNextInt()){
@@ -56,10 +55,18 @@ public class ConsoleUI {
         deck.setCardIndex(0);
         while(deck.hasNextCard()){
             Card card = deck.getNextCard();
-            int info = showIndexes?(deck.getCardIndex()):card.getOx();
-            System.out.printf("%d (%d), ",card.getNumber(),info);
+//            int info = showIndexes?(deck.getCardIndex()):card.getOx();
+//            System.out.printf("%d (%d), ",card.getNumber(),info);
+            System.out.printf("%d, ",card.getNumber());
         }
         deck.setCardIndex(lastCardIndex);
+    }
+    private void showOxInfo(){
+        GameState gs = gm.getGameState();
+        System.out.println("Ox Info: ");
+        for(int i=0;i<gs.getPlayers().length;i++){
+            System.out.printf("Player %d: %d%n",i,gs.getPlayers()[i].getOx());
+        }
     }
     private void showBoard(){
         System.out.println("Current Table:");
@@ -68,11 +75,8 @@ public class ConsoleUI {
         System.out.println("Your Hand:");
         Deck playerDeck = gs.getPlayer().getDeck();
         listCardsOfTable(playerDeck,true);
-        System.out.println("\nOx Info: ");
-        for(int i=0;i<gs.getPlayers().length;i++){
-            System.out.printf("Player %d: %d%n",i,gs.getPlayers()[i].getOx());
-        }
     }
+
     private void chooseCard(){
         System.out.println("Choose one Card to play");
         GameState gs = gm.getGameState();
@@ -83,23 +87,27 @@ public class ConsoleUI {
         System.out.println();
         if(sc.hasNextInt()){
             int cardNum = sc.nextInt();
-            if(cardNum<11 && cardNum>0){
+            if(cardNum<=gs.getPlayer().getCardsNumber() && cardNum>0){
                 Card card = gs.getPlayer().chooseCard(cardNum-1);
                 ms.addMove(gs.getPlayer(),card);
-                gm.letAiChoose();
+                gm.letAiChooseHandCard();
+                gm.setPlayerChooseTableRow(realPlayer->{
+                    // TODO: show current table
+                    boolean exit = false;
+                    do{
+                        System.out.print("Bitte Kartenreihe wählen: ");
+                        int n = sc.nextInt();
+                        if(n>0 && n<5){
+                            realPlayer.setRow(n);
+                            exit = true;
+                        }else{
+                            System.out.println("Falsche Zahl!");
+                        }
+                    }while(!exit);
+                });
                 gm.playRound();
-
-//                System.out.println("Lege Karte "+card.getNumber()+" in Reihe: (bitte Auswählen:)");
-//                getCurrentTable(gs);
-//                if(sc.hasNextInt()){
-//                    int rowNum = sc.nextInt();
-//                    if(rowNum<5 && rowNum>0) {
-//                        System.out.println("Reihe "+rowNum+": ");
-//                        listCardsOfTable(gs.getTable()[rowNum-1],true);
-//                        System.out.println();
-//                        System.out.println("");
-//                    }
-//                }
+            }else{
+                System.out.println("Out of range total="+gs.getPlayer().getCardsNumber()+" cn="+cardNum);
             }
         }
     }
@@ -108,11 +116,15 @@ public class ConsoleUI {
         System.exit(0);
     }
     private void ShowMenuItemOption(int menuItem){
-        System.out.printf("Eingabe %d (%s)%n",menuItem,MenuItems.values()[menuItem].name());
+//        System.out.printf("Eingabe %d (%s)%n",menuItem,MenuItems.values()[menuItem].name());
         MenuItems item = fetchValue(menuItem);
         switch (item){
             case ShowBoard:{
                 showBoard();
+                break;
+            }
+            case ShowGame: {
+                showOxInfo();
                 break;
             }
             case ChooseCard: {

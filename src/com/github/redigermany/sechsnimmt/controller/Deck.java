@@ -1,14 +1,11 @@
-package controller;
-
-import java.util.ArrayList;
-
+package com.github.redigermany.sechsnimmt.controller;
 public class Deck {
     private Card[] cards;
     private int cardIndex=0;
     private boolean fixedLength=false;
 
     public Card getLastCard(){
-        for(int i=cards.length-1;i>0;i--){
+        for(int i=cards.length-1;i>=0;i--){
             if(cards[i]!=null){
                 return cards[i];
             }
@@ -83,12 +80,15 @@ public class Deck {
     public void removeCard(int n){
         Card[] oldCards = cards;
         cards = new Card[oldCards.length-1];
-        int counter = 0;
-        for(int i=0;i<n;i++){
-            cards[counter++] = oldCards[i];
-        }
-        for(int i=n+1;i<oldCards.length;i++){
-            cards[counter++] = oldCards[i];
+        cardIndex--;
+        if(cardIndex>0){
+            int counter = 0;
+            for (int i = 0; i < n; i++) {
+                cards[counter++] = oldCards[i];
+            }
+            for (int i = n + 1; i < oldCards.length; i++) {
+                cards[counter++] = oldCards[i];
+            }
         }
     }
 
@@ -99,4 +99,5 @@ public class Deck {
         cardIndex = 1;
         return ret;
     }
+
 }
