@@ -1,6 +1,9 @@
 package com.github.redigermany.sechsnimmt.view;
 
 import com.github.redigermany.sechsnimmt.controller.Card;
+import com.github.redigermany.sechsnimmt.controller.GameMaster;
+import com.github.redigermany.sechsnimmt.model.GameState;
+import com.github.redigermany.sechsnimmt.model.MovesState;
 import javafx.animation.AnimationTimer;
 import javafx.animation.ScaleTransition;
 import javafx.animation.Timeline;
@@ -26,6 +29,9 @@ class PlayCard extends Pane {
     private Label oxNum = new Label("");
     private Card card;
     private double hoverScaleFactor = 0.9;
+    private GameMaster gm;
+    private MovesState ms;
+    private GameState gs;
 
     public PlayCard(GUI gui) {
         this(gui, Color.TRANSPARENT);
@@ -33,6 +39,9 @@ class PlayCard extends Pane {
 
     public PlayCard(GUI gui, Color color) {
         this.gui = gui;
+        gm = gui.getGm();
+        ms = gm.getMovesState();
+        gs = gm.getGameState();
         this.getChildren().addAll(numberLabel, oxNum);
         setCardStyle(color);
         setNumberLabelStyle();
@@ -43,30 +52,57 @@ class PlayCard extends Pane {
     private void setListeners() {
         setOnMouseClicked(e->{
             if(gui.isAllowedToChoose()){
-                System.out.println(card);
+                for(int i=0;i<10;i++){
+                    Card c = gui.getGm().getGameState().getPlayer().getCard(i);
+                    if(c!=null && c.equals(card)){
+                        Card card = gui.getGm().getGameState().getPlayer().chooseCard(i);
+                        ms.addMove(gs.getPlayer(),card);
+                        gm.letAiChooseHandCard();
+                        gm.setPlayerChooseTableRow(realPlayer->{
+                            gui.statusLabel.setText("Status: Choose row!");
+                            System.out.println("Choose row!");
+//                            // TODO: show current table
+//                            boolean exit = false;
+//                            do{
+//                                System.out.print("Bitte Kartenreihe wählen: ");
+//                                int n = sc.nextInt();
+//                                if(n>0 && n<5){
+//                                    realPlayer.setRow(n);
+//                                    exit = true;
+//                                }else{
+//                                    System.out.println("Falsche Zahl!");
+//                                }
+//                            }while(!exit);
+                        });
+                        gm.playRound();
+                        System.out.println(card+": card num="+i);
+                        gui.updateTable();
+                        break;
+                    }
+                }
+            }else{
+                gui.statusLabel.setText("Status: Not your turn!");
             }
         });
         setOnMouseEntered(e -> {
             if (isLocked()) return;
             setCursor(Cursor.HAND);
-            ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(100),this);
-            scaleTransition.setToX(hoverScaleFactor);
-            scaleTransition.setToY(hoverScaleFactor);
-            scaleTransition.setFromX(1);
-            scaleTransition.setFromY(1);
-            scaleTransition.setCycleCount(1);
-            scaleTransition.play();
+            setCardAnimation(1,hoverScaleFactor);
         });
         setOnMouseExited(e -> {
             if (isLocked()) return;
-            ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(100),this);
-            scaleTransition.setFromX(hoverScaleFactor);
-            scaleTransition.setFromY(hoverScaleFactor);
-            scaleTransition.setToX(1);
-            scaleTransition.setToY(1);
-            scaleTransition.setCycleCount(1);
-            scaleTransition.play();
+            setCardAnimation(hoverScaleFactor,1);
         });
+    }
+
+    private void setCardAnimation(double from,double to){
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(300),this);
+        scaleTransition.setFromX(from);
+        scaleTransition.setFromY(from);
+        scaleTransition.setToX(to);
+        scaleTransition.setToY(to);
+        scaleTransition.setCycleCount(1);
+        scaleTransition.play();
     }
 
     private void setCardStyle(Color color) {
@@ -94,10 +130,14 @@ class PlayCard extends Pane {
     }
 
     public void setCard(Card card) {
+        if(card==null) {
+            clearCard();
+            return;
+        }
         this.card = card;
         unlock();
-        oxNum.setText(card.getOx().toString());
-        numberLabel.setText(card.getNumber().toString());
+        setOx(card.getOx());
+        setText(card.getNumber());
     }
 
     public void setText(String text) {
@@ -106,6 +146,14 @@ class PlayCard extends Pane {
 
     public void setOx(String text) {
         oxNum.setText(text);
+    }
+
+    public void setText(Integer text) {
+        setText(text.toString());
+    }
+
+    public void setOx(Integer text) {
+        setOx(text.toString());
     }
 
     public void lock() {
@@ -120,4 +168,10 @@ class PlayCard extends Pane {
         return locked;
     }
 
+    private void clearCard() {
+        setCardAnimation(1,1);
+        setText("");
+        setOx("");
+        lock();
+    }
 }

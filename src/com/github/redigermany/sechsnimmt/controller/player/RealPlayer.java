@@ -15,7 +15,7 @@ public class RealPlayer extends Player {
 
     @Override
     public void chooseRow(GameMaster gm) {
-//        gm.letRealPlayerChoose(this);
-        this.setRow(1);
+        gm.letRealPlayerChoose(this);
+//        this.setRow(1);
     }
 }

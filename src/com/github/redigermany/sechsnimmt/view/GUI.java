@@ -2,18 +2,14 @@ package com.github.redigermany.sechsnimmt.view;
 import com.github.redigermany.sechsnimmt.controller.Card;
 import com.github.redigermany.sechsnimmt.controller.Deck;
 import com.github.redigermany.sechsnimmt.controller.GameMaster;
+import com.github.redigermany.sechsnimmt.model.WindowState;
 import com.github.redigermany.sechsnimmt.controller.player.RealPlayer;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class GUI extends Application {
@@ -24,6 +20,11 @@ public class GUI extends Application {
     private RealPlayer player;
     private PlayCard[][] table = new PlayCard[4][5];
     private boolean allowedToChoose = true;
+    private WindowState windowState;
+
+    public GameMaster getGm() {
+        return gm;
+    }
 
     private void generateHandBar(){
         for(int i=0;i<10;i++){
@@ -45,7 +46,7 @@ public class GUI extends Application {
         }
     }
 
-    private void updateTable(){
+    public void updateTable(){
         oxCard.setText(player.getOx().toString());
         Deck deck = player.getDeck();
         for(int i=0;i<10;i++){
@@ -54,29 +55,41 @@ public class GUI extends Application {
         Deck[] tableData = gm.getGameState().getTable();
         for(int i=0;i<4;i++){
             for(int j=0;j<5;j++){
-                Card card = tableData[i].getCard(j);
-                if(card!=null){
-                    table[i][j].setCard(card);
-                }
+                table[i][j].setCard(tableData[i].getCard(j));
             }
         }
     }
+    public Label statusLabel = new Label("Status: Initializing...");
 
     @Override
     public void start(Stage stage) throws Exception {
-        stage.setTitle("6 nimmt!");
-        generateHandBar();
-        generateTable();
         gm = new GameMaster(2,66);
         player = gm.getGameState().getPlayer();
+
+        statusLabel.setTextFill(Color.WHITE);
+        root.add(statusLabel,0,0);
+
+        windowState = new WindowState("main.cfg");
+
+        generateHandBar();
+        generateTable();
+
         updateTable();
         root.setBackground(new Background(new BackgroundFill(Color.BLACK,new CornerRadii(0),new Insets(0))));
+
+        statusLabel.setText("Status: Your turn!");
+        stage.setX(windowState.getX());
+        stage.setY(windowState.getY());
+        stage.setTitle("6 nimmt!");
         stage.setScene(new Scene(root));
         stage.show();
-    }
+        stage.xProperty().addListener((obs, oldVal, newVal) -> {
+            windowState.setX((double) newVal);
+        });
+        stage.yProperty().addListener((obs, oldVal, newVal) -> {
+            windowState.setY((double) newVal);
+        });
 
-    public static void main(String[] args) {
-        launch();
     }
 
     public boolean isAllowedToChoose() {
