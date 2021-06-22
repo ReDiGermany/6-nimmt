@@ -13,12 +13,12 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class GUI extends Application {
-    private GridPane root = new GridPane();
-    private PlayCard[] handCards = new PlayCard[10];
+    private final GridPane root = new GridPane();
+    private final PlayCard[] handCards = new PlayCard[10];
     private PlayCard oxCard;
     private GameMaster gm;
     private RealPlayer player;
-    private PlayCard[][] table = new PlayCard[4][5];
+    private final PlayCard[][] table = new PlayCard[4][5];
     private boolean allowedToChoose = true;
     private WindowState windowState;
 
