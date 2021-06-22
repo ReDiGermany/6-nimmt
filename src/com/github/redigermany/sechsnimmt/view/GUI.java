@@ -75,7 +75,7 @@ public class GUI extends Application {
         generateTable();
 
         updateTable();
-        root.setBackground(new Background(new BackgroundFill(Color.BLACK,new CornerRadii(0),new Insets(0))));
+        root.setStyle("-fx-background-color:#000");
 
         statusLabel.setText("Status: Your turn!");
         stage.setX(windowState.getX());
@@ -83,12 +83,8 @@ public class GUI extends Application {
         stage.setTitle("6 nimmt!");
         stage.setScene(new Scene(root));
         stage.show();
-        stage.xProperty().addListener((obs, oldVal, newVal) -> {
-            windowState.setX((double) newVal);
-        });
-        stage.yProperty().addListener((obs, oldVal, newVal) -> {
-            windowState.setY((double) newVal);
-        });
+        stage.xProperty().addListener((obs, oldVal, newVal) -> windowState.setX((double) newVal));
+        stage.yProperty().addListener((obs, oldVal, newVal) -> windowState.setY((double) newVal));
 
     }
 
