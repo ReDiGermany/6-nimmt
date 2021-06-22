@@ -2,6 +2,7 @@ package com.github.redigermany.sechsnimmt.view;
 import com.github.redigermany.sechsnimmt.controller.Card;
 import com.github.redigermany.sechsnimmt.controller.Deck;
 import com.github.redigermany.sechsnimmt.controller.GameMaster;
+import com.github.redigermany.sechsnimmt.controller.PlayCardObserver;
 import com.github.redigermany.sechsnimmt.model.WindowState;
 import com.github.redigermany.sechsnimmt.controller.player.RealPlayer;
 import javafx.application.Application;
@@ -21,6 +22,14 @@ public class GUI extends Application {
     private final PlayCard[][] table = new PlayCard[4][5];
     private boolean allowedToChoose = true;
     private WindowState windowState;
+    public Label statusLabel = new Label("Status: Initializing...");
+
+    private final PlayCardObserver doPick = card -> {
+        if(allowedToChoose){
+            allowedToChoose = false;
+            statusLabel.setText("Status: You chose "+card.getNumber());
+        }
+    };
 
     public GameMaster getGm() {
         return gm;
@@ -29,9 +38,7 @@ public class GUI extends Application {
     private void generateHandBar(){
         for(int i=0;i<10;i++){
             PlayCard playCard = new PlayCard(this,Color.DARKBLUE);
-            playCard.onPick(card->{
-                System.out.println("picked "+card);
-            });
+            playCard.onPick(doPick);
             handCards[i] = playCard;
             root.add(handCards[i],i,5);
         }
@@ -62,7 +69,6 @@ public class GUI extends Application {
             }
         }
     }
-    public Label statusLabel = new Label("Status: Initializing...");
 
     @Override
     public void start(Stage stage) throws Exception {
