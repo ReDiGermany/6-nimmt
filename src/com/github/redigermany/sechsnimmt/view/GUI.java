@@ -29,6 +29,9 @@ public class GUI extends Application {
     private void generateHandBar(){
         for(int i=0;i<10;i++){
             PlayCard playCard = new PlayCard(this,Color.DARKBLUE);
+            playCard.onPick(card->{
+                System.out.println("picked "+card);
+            });
             handCards[i] = playCard;
             root.add(handCards[i],i,5);
         }

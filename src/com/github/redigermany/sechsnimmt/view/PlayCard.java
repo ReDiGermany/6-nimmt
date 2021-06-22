@@ -2,11 +2,10 @@ package com.github.redigermany.sechsnimmt.view;
 
 import com.github.redigermany.sechsnimmt.controller.Card;
 import com.github.redigermany.sechsnimmt.controller.GameMaster;
+import com.github.redigermany.sechsnimmt.controller.PlayCardObserver;
 import com.github.redigermany.sechsnimmt.model.GameState;
 import com.github.redigermany.sechsnimmt.model.MovesState;
-import javafx.animation.AnimationTimer;
 import javafx.animation.ScaleTransition;
-import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -20,7 +19,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
-class PlayCard extends Pane {
+import java.util.ArrayList;
+import java.util.List;
+
+public class PlayCard extends Pane {
     private final int HEIGHT = 180;
     private final int WIDTH = 120;
     private GUI gui;
@@ -49,41 +51,54 @@ class PlayCard extends Pane {
         setListeners();
     }
 
+    private final List<PlayCardObserver> observers = new ArrayList<>();
+
+    public void onPick(PlayCardObserver observer){
+        observers.add(observer);
+    }
+
+    private void notifyAllObservers(){
+        for (PlayCardObserver observer : observers) {
+            observer.doPick(this);
+        }
+    }
+
     private void setListeners() {
-        setOnMouseClicked(e->{
-            if(gui.isAllowedToChoose()){
-                for(int i=0;i<10;i++){
-                    Card c = gui.getGm().getGameState().getPlayer().getCard(i);
-                    if(c!=null && c.equals(card)){
-                        Card card = gui.getGm().getGameState().getPlayer().chooseCard(i);
-                        ms.addMove(gs.getPlayer(),card);
-                        gm.letAiChooseHandCard();
-                        gm.setPlayerChooseTableRow(realPlayer->{
-                            gui.statusLabel.setText("Status: Choose row!");
-                            System.out.println("Choose row!");
-//                            // TODO: show current table
-//                            boolean exit = false;
-//                            do{
-//                                System.out.print("Bitte Kartenreihe wählen: ");
-//                                int n = sc.nextInt();
-//                                if(n>0 && n<5){
-//                                    realPlayer.setRow(n);
-//                                    exit = true;
-//                                }else{
-//                                    System.out.println("Falsche Zahl!");
-//                                }
-//                            }while(!exit);
-                        });
-                        gm.playRound();
-                        System.out.println(card+": card num="+i);
-                        gui.updateTable();
-                        break;
-                    }
-                }
-            }else{
-                gui.statusLabel.setText("Status: Not your turn!");
-            }
-        });
+        setOnMouseClicked(e->notifyAllObservers());
+//        setOnMouseClicked(e->{
+//            if(gui.isAllowedToChoose()){
+//                for(int i=0;i<10;i++){
+//                    Card c = gui.getGm().getGameState().getPlayer().getCard(i);
+//                    if(c!=null && c.equals(card)){
+//                        Card card = gui.getGm().getGameState().getPlayer().chooseCard(i);
+//                        ms.addMove(gs.getPlayer(),card);
+//                        gm.letAiChooseHandCard();
+//                        gm.setPlayerChooseTableRow(realPlayer->{
+//                            gui.statusLabel.setText("Status: Choose row!");
+//                            System.out.println("Choose row!");
+////                            // TODO: show current table
+////                            boolean exit = false;
+////                            do{
+////                                System.out.print("Bitte Kartenreihe wählen: ");
+////                                int n = sc.nextInt();
+////                                if(n>0 && n<5){
+////                                    realPlayer.setRow(n);
+////                                    exit = true;
+////                                }else{
+////                                    System.out.println("Falsche Zahl!");
+////                                }
+////                            }while(!exit);
+//                        });
+//                        gm.playRound();
+//                        System.out.println(card+": card num="+i);
+//                        gui.updateTable();
+//                        break;
+//                    }
+//                }
+//            }else{
+//                gui.statusLabel.setText("Status: Not your turn!");
+//            }
+//        });
         setOnMouseEntered(e -> {
             if (isLocked()) return;
             setCursor(Cursor.HAND);
