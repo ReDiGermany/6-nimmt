@@ -25,15 +25,14 @@ import java.util.List;
 public class PlayCard extends Pane {
     private final int HEIGHT = 180;
     private final int WIDTH = 120;
-    private GUI gui;
+    private final GUI gui;
     private boolean locked = true;
-    private Label numberLabel = new Label("");
-    private Label oxNum = new Label("");
-    private Card card;
+    private final Label numberLabel = new Label("");
+    private final Label oxNum = new Label("");
     private double hoverScaleFactor = 0.9;
-    private GameMaster gm;
-    private MovesState ms;
-    private GameState gs;
+    private final GameMaster gm;
+    private final MovesState ms;
+    private final GameState gs;
 
     public PlayCard(GUI gui) {
         this(gui, Color.TRANSPARENT);
@@ -149,7 +148,6 @@ public class PlayCard extends Pane {
             clearCard();
             return;
         }
-        this.card = card;
         unlock();
         setOx(card.getOx());
         setText(card.getNumber());
