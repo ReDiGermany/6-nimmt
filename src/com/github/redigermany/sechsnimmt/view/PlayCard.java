@@ -34,6 +34,14 @@ public class PlayCard extends Pane {
     private final MovesState ms;
     private final GameState gs;
 
+    public final Integer getOx(){
+        return Integer.parseInt(oxNum.getText());
+    }
+
+    public final Integer getNumber(){
+        return Integer.parseInt(numberLabel.getText());
+    }
+
     public PlayCard(GUI gui) {
         this(gui, Color.TRANSPARENT);
     }
@@ -50,20 +58,20 @@ public class PlayCard extends Pane {
         setListeners();
     }
 
-    private final List<PlayCardObserver> observers = new ArrayList<>();
+    private final List<PlayCardObserver> pickObservers = new ArrayList<>();
 
     public void onPick(PlayCardObserver observer){
-        observers.add(observer);
+        pickObservers.add(observer);
     }
 
-    private void notifyAllObservers(){
-        for (PlayCardObserver observer : observers) {
+    private void notifyAllObserversForPick(){
+        for (PlayCardObserver observer : pickObservers) {
             observer.doPick(this);
         }
     }
 
     private void setListeners() {
-        setOnMouseClicked(e->notifyAllObservers());
+        setOnMouseClicked(e->notifyAllObserversForPick());
 //        setOnMouseClicked(e->{
 //            if(gui.isAllowedToChoose()){
 //                for(int i=0;i<10;i++){
